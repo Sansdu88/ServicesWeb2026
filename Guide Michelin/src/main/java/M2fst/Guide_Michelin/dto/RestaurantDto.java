@@ -8,6 +8,7 @@ import lombok.Setter;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -23,6 +24,7 @@ public class RestaurantDto {
     public String adresse;
     public String url_image_restaurant;
     public Double moyenne;
+    public List<EvaluationDto> evaluations;
 
     public static RestaurantDto fromEntity(RestaurantEntity restaurantEntity){
         RestaurantDto restaurantDto = new RestaurantDto();
@@ -30,6 +32,8 @@ public class RestaurantDto {
         restaurantDto.nom = restaurantEntity.getNom();
         restaurantDto.adresse = restaurantEntity.getAdresse();
         restaurantDto.url_image_restaurant = restaurantEntity.getUrlImageRestaurant();
+        restaurantDto.evaluations = new ArrayList<>();
+
         List<EvaluationEntity> evaluations = restaurantEntity.getEvaluations();
         if (evaluations == null || evaluations.isEmpty()) {
             restaurantDto.moyenne = (double) -1;
@@ -37,6 +41,7 @@ public class RestaurantDto {
             double somme = 0;
             for (EvaluationEntity evaluation : evaluations) {
                 somme += evaluation.getNote();
+                restaurantDto.evaluations.add(EvaluationDto.fromEntity(evaluation));
             }
             restaurantDto.moyenne = somme / evaluations.size();
         }
